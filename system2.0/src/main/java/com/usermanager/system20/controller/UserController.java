@@ -2,6 +2,7 @@ package com.usermanager.system20.controller;
 
 
 import com.usermanager.system20.entity.UserEntity;
+import com.usermanager.system20.exceptions.UserListEmptyException;
 import com.usermanager.system20.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,14 +21,21 @@ public class UserController {
 
     @PostMapping("/create")
     public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user) {
+
         UserEntity createdUser = userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserEntity>> getAllUsers() {
-        List<UserEntity> users = userService.listUser();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<?> getAllUsers() { // Testing...
+        try {
+            List<UserEntity> users = userService.listUser();
+            return ResponseEntity.ok(users);
+        } catch (UserListEmptyException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error ocurred.");
+        }
     }
 
     @PutMapping("/{id}")

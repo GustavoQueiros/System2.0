@@ -1,6 +1,8 @@
 package com.usermanager.system20.service;
 
 import com.usermanager.system20.entity.UserEntity;
+import com.usermanager.system20.exceptions.UserAlreadyExistsException;
+import com.usermanager.system20.exceptions.UserListEmptyException;
 import com.usermanager.system20.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,19 +16,33 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    public UserEntity createUser(UserEntity user) {
-        return userRepository.save(user);//crete the exception User Already exist
+    public UserEntity createUser(UserEntity user) throws UserAlreadyExistsException{
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new UserAlreadyExistsException("User with email: " + user.getEmail() + " already exists.");
+        }
+
+        return userRepository.save(user);//Make the Exception return on the scream of insomnia!
     }
 
-    public List<UserEntity> listUser() {
-        return userRepository.findAll();//Exception UserListEmpty
+    //<All Ok with the exception UserListEmptyException>
+    public List<UserEntity> listUser() throws UserListEmptyException {
+
+        List<UserEntity> usersList = userRepository.findAll();
+
+        if (usersList.isEmpty()) {
+            throw new UserListEmptyException("No users found in the database");
+        }
+
+        return usersList;
+
     }
 
     public Optional<UserEntity> updateUser(UserEntity user, Long id) {
         Optional<UserEntity> existingUser = userRepository.findById(id);
         if (existingUser.isEmpty()) {
             return Optional.empty();
-        }                                       //Exception password and email
+        }                                       //Exception password and email wrong AND User Not Found
         UserEntity updatedUser = existingUser.get();
 
         updatedUser.setName(user.getName());
@@ -44,7 +60,7 @@ public class UserService {
         if (existingUser.isEmpty()) {
             return Optional.empty();
         }
-                                        //exception user do not exist
+        //exception user do not exist
         userRepository.deleteById(id);
 
         return existingUser;

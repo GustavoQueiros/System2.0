@@ -2,7 +2,9 @@ package com.usermanager.system20.controller;
 
 
 import com.usermanager.system20.entity.UserEntity;
+import com.usermanager.system20.exceptions.UserAlreadyExistsException;
 import com.usermanager.system20.exceptions.UserListEmptyException;
+import com.usermanager.system20.exceptions.UserNotFoundException;
 import com.usermanager.system20.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,14 +22,20 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/create")
-    public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user) {
+    public ResponseEntity<?> createUser(@RequestBody UserEntity user) {
 
-        UserEntity createdUser = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        try {
+            UserEntity createdUser = userService.createUser(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        } catch (UserAlreadyExistsException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error ocurred.");
+        }
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllUsers() { // Testing...
+    public ResponseEntity<?> getAllUsers() {
         try {
             List<UserEntity> users = userService.listUser();
             return ResponseEntity.ok(users);
@@ -42,24 +50,21 @@ public class UserController {
     public ResponseEntity<?> updateUser(@RequestBody UserEntity user, @PathVariable Long id) {
         try {
             Optional<UserEntity> updatedUser = userService.updateUser(user, id);
-            if (updatedUser.isPresent()) {
-                return ResponseEntity.ok(updatedUser.get());
-            }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            return ResponseEntity.ok(updatedUser);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error ocurred.");
         }
-
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
             Optional<UserEntity> deletedUser = userService.deleteUser(id);
-            if (deletedUser.isPresent()) {
-                return ResponseEntity.ok(deletedUser.get());
-            }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            return ResponseEntity.ok(deletedUser);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error ocurred.");
         }

@@ -9,8 +9,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "USER_ENTITY")
 public class UserEntity {
@@ -31,4 +31,5 @@ public class UserEntity {
 
     @Column(name = "PASSWORD")
     private String password;
+
 }

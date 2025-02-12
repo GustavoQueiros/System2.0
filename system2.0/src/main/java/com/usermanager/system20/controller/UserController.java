@@ -1,6 +1,7 @@
 package com.usermanager.system20.controller;
 
 
+import com.usermanager.system20.dto.UserDTO;
 import com.usermanager.system20.entity.UserEntity;
 import com.usermanager.system20.exceptions.UserAlreadyExistsException;
 import com.usermanager.system20.exceptions.UserListEmptyException;
@@ -21,6 +22,37 @@ public class UserController {
     @Autowired
     UserService userService;
 
+
+    @GetMapping
+    public ResponseEntity<?> getAllUsers() {
+
+        try {
+            List<UserDTO> users = userService.listUser()
+                    .stream()
+                    .map(UserDTO::new)
+                    .toList();
+
+            return ResponseEntity.ok(users);
+        } catch (UserListEmptyException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error ocurred.");
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
+
+        Optional<UserEntity> user = userService.getUserById(id);
+
+        if (user.isPresent()) {
+            return ResponseEntity.ok(new UserDTO(user.get()));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+    }
+
     @PostMapping("/create")
     public ResponseEntity<?> createUser(@RequestBody UserEntity user) {
 
@@ -29,18 +61,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
         } catch (UserAlreadyExistsException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error ocurred.");
-        }
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAllUsers() {
-        try {
-            List<UserEntity> users = userService.listUser();
-            return ResponseEntity.ok(users);
-        } catch (UserListEmptyException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error ocurred.");
         }
@@ -69,5 +89,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error ocurred.");
         }
     }
+
 
 }

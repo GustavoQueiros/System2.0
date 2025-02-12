@@ -38,6 +38,14 @@ public class UserService {
 
     }
 
+    public Optional<UserEntity> getUserById(Long id){
+
+        Optional<UserEntity> userById = userRepository.findById(id);
+
+        return userById;
+
+    }
+
     public Optional<UserEntity> updateUser(UserEntity user, Long id) throws UserNotFoundException {
         Optional<UserEntity> existingUser = userRepository.findById(id);
         if (existingUser.isEmpty()) {

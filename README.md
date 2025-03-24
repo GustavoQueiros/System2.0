@@ -1,4 +1,4 @@
-# System2.0 - User Management Application
+# 🇺🇸System2.0 - User Management Application
 
 System2.0 is a Java application developed with Spring Boot, offering a CRUD (Create, Read, Update, Delete) for user management. The application uses H2 Database, JPA for data persistence, and Lombok to reduce boilerplate code. Additionally, the project is containerized with Docker to facilitate execution and management.
 
@@ -22,7 +22,7 @@ System2.0 is a Java application developed with Spring Boot, offering a CRUD (Cre
 
 #
 
-# System2.0 - Aplicação de Gerenciamento de Usuários
+# 🇧🇷System2.0 - Aplicação de Gerenciamento de Usuários
 
 System2.0 é uma aplicação Java desenvolvida com Spring Boot, oferecendo um CRUD (Create, Read, Update, Delete) para gerenciamento de usuários. A aplicação utiliza H2 Database, JPA para persistência de dados e Lombok para reduzir boilerplate code. Além disso, o projeto está containerizado com Docker para facilitar a execução e o gerenciamento.
 
